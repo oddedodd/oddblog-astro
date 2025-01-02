@@ -1,0 +1,38 @@
+---
+import type { SanityDocument } from "@sanity/client";
+import { loadQuery } from "../../sanity/lib/load-query";
+import { urlForImage } from "../../sanity/lib/urlForImage";
+import PortableText from "../../components/PortableText.astro";
+
+
+export async function getStaticPaths() {
+  const { data: projects } = await loadQuery<SanityDocument[]>({
+    query: `*[_type == "portfolio"]`,
+  });
+
+  return projects.map(({ slug }) => {
+    return {
+      params: {
+        slug: slug.current,
+      },
+    };
+  });
+}
+
+const { params } = Astro;
+
+const { data: project } = await loadQuery({
+  query: `*[_type == "post" && slug.current == $slug][0]`,
+  params,
+});
+
+const url = urlForImage(project.mainImage).url();
+const webpUrl = urlForImage(project.mainImage).format("webp").url();
+
+console.log(url)
+
+---
+
+<h1>A post about {project.title}</h1>
+<img src={url} alt={project.mainImage.alt} />
+<PortableText portableText={project.body} />
