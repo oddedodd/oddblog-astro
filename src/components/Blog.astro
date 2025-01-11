@@ -1,0 +1,24 @@
+---
+import { sanityClient } from "sanity:client";
+
+const posts = await sanityClient.fetch(`
+  *[_type == "post"] {
+    title,
+    slug,
+    body
+  }
+`);
+
+console.log(posts);
+
+---
+
+<h1>Blog test</h1>
+<ul>
+{posts.map((post) => (
+  <li>
+    <h2><a href={`/portfolio/${post.slug.current}`}>{post.title}</a></h2>
+    <p>{post.body}</p>
+  </li>
+))}
+</ul>
